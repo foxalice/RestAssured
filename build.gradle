@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'io.qameta.allure' version '2.10.0'
+    id 'io.freefair.lombok' version '6.5.1'
 }
 
 repositories {
@@ -8,7 +9,10 @@ repositories {
 }
 
 def allureVersion = "2.19.0",
-    slf4jVersion = "1.7.32"
+    slf4jVersion = "1.7.32",
+    assertJVersion = "3.24.2",
+    restAssuredVersion = "5.3.0",
+    jacksonVersion = "2.14.0"
 
 allure {
     report {
@@ -37,12 +41,29 @@ dependencies {
             "com.github.javafaker:javafaker:0.12",
             'org.aeonbits.owner:owner:1.0.12',
             "org.junit.jupiter:junit-jupiter:5.9.1",
-            "org.slf4j:slf4j-simple:$slf4jVersion"
+            "org.slf4j:slf4j-simple:$slf4jVersion",
+            "io.qameta.allure:allure-selenide:$allureVersion",
+            "org.assertj:assertj-core:$assertJVersion",
+            "org.aeonbits.owner:owner:1.0.12",
+            "com.fasterxml.jackson.core:jackson-core:$jacksonVersion",
+            "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     )
 }
 
 test {
     useJUnitPlatform()
+}
+
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+    systemProperties(System.getProperties())
+    testLogging {
+        lifecycle {
+            events "started", "skipped", "failed", "standard_error", "standard_out"
+            exceptionFormat "short"
+        }
+    }
 }
 
 tasks.withType(Test) {
@@ -53,5 +74,11 @@ tasks.withType(Test) {
 task remote_test(type: Test) {
     useJUnitPlatform {
         includeTags("remote")
+    }
+}
+
+task api_tests(type: Test) {
+    useJUnitPlatform {
+        includeTags ("api")
     }
 }
