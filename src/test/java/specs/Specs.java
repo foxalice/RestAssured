@@ -7,8 +7,7 @@ import io.restassured.specification.ResponseSpecification;
 
 import static helpers.CustomApiListener.withCustomTemplates;
 import static io.restassured.RestAssured.with;
-import static io.restassured.filter.log.LogDetail.BODY;
-import static io.restassured.filter.log.LogDetail.STATUS;
+import static io.restassured.filter.log.LogDetail.*;
 
 public class Specs {
 
@@ -22,9 +21,17 @@ public class Specs {
             .contentType(ContentType.JSON);
 
     public static ResponseSpecification baseResponseSpecCode200 = new ResponseSpecBuilder()
+            .log(URI)
             .log(STATUS)
             .log(BODY)
             .expectStatusCode(200)
+            .build();
+
+    public static ResponseSpecification baseResponseSpecCode201 = new ResponseSpecBuilder()
+            .log(URI)
+            .log(STATUS)
+            .log(BODY)
+            .expectStatusCode(201)
             .build();
 
     public static ResponseSpecification baseResponseSpecCode204 = new ResponseSpecBuilder()

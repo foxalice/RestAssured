@@ -1,84 +1,52 @@
 plugins {
     id 'java-library'
     id 'io.qameta.allure' version '2.10.0'
-    id 'io.freefair.lombok' version '6.5.1'
+    id "io.freefair.lombok" version "6.0.0-m2"
 }
 
 repositories {
     mavenCentral()
 }
 
-def allureVersion = "2.19.0",
-    slf4jVersion = "1.7.32",
-    assertJVersion = "3.24.2",
-    restAssuredVersion = "5.3.0",
-    jacksonVersion = "2.14.0"
+def allureVersion = "2.19.0"
+
 
 allure {
     report {
         version.set(allureVersion)
     }
-    adapter { // отвечает за появление папочки build/allure-results
-        aspectjWeaver.set(true) //обработка аннотации @Step
+    adapter {
+        aspectjWeaver.set(true)
         frameworks {
-            junit5 { //название фреймворка
-                adapterVersion.set(allureVersion) //версия интеграции фреймворка и Allure
+            junit5 {
+                adapterVersion.set(allureVersion)
             }
         }
     }
 }
-compileJava {
-    options.encoding = 'UTF-8'
-}
-compileTestJava {
-    options.encoding = 'UTF-8'
-}
+
 dependencies {
     testImplementation(
-            "io.rest-assured:rest-assured:5.3.0",
-            "com.codeborne:selenide:6.12.2",
-            "io.qameta.allure:allure-selenide:$allureVersion",
-            "com.github.javafaker:javafaker:0.12",
-            'org.aeonbits.owner:owner:1.0.12',
-            "org.junit.jupiter:junit-jupiter:5.9.1",
-            "org.slf4j:slf4j-simple:$slf4jVersion",
-            "io.qameta.allure:allure-selenide:$allureVersion",
-            "org.assertj:assertj-core:$assertJVersion",
-            "org.aeonbits.owner:owner:1.0.12",
-            "com.fasterxml.jackson.core:jackson-core:$jacksonVersion",
-            "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+            'org.junit.jupiter:junit-jupiter:5.8.1',
+            'io.rest-assured:rest-assured:5.3.0',
+            "io.qameta.allure:allure-rest-assured:$allureVersion",
+            "com.fasterxml.jackson.core:jackson-databind:2.14.2",
+            "org.assertj:assertj-core:3.24.2",
+            "io.qameta.allure:allure-selenide:$allureVersion"
     )
+
+
 }
 
 test {
-    useJUnitPlatform()
-}
-
-
-tasks.withType(Test) {
-    useJUnitPlatform()
-    systemProperties(System.getProperties())
-    testLogging {
-        lifecycle {
-            events "started", "skipped", "failed", "standard_error", "standard_out"
-            exceptionFormat "short"
-        }
-    }
-}
-
-tasks.withType(Test) {
     systemProperties(System.getProperties())
     useJUnitPlatform()
+
 }
 
-task remote_test(type: Test) {
+task lombok_tests(type: Test) {
     useJUnitPlatform {
-        includeTags("remote")
+        includeTags("Lombok")
     }
-}
-
-task api_tests(type: Test) {
-    useJUnitPlatform {
-        includeTags ("api")
-    }
+    systemProperties(System.getProperties())
 }

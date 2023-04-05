@@ -1,122 +1,101 @@
-import models.CreateUserResponseModel;
-import models.UpdateUserResponseModel;
-import models.UserBodyModel;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
-import static org.assertj.core.api.Assertions.assertThat;
+import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.hasItems;
-
 import static org.hamcrest.Matchers.*;
-import static specs.Endpoints.*;
-import static specs.Specs.*;
 
 public class ReqresinTest {
 
-    @Tag("api")
     @DisplayName("Checking token and auth")
     @Test
     void loginTest() {
-        UserBodyModel data = new UserBodyModel();
-        data.setEmail("eve.holt@reqres.in");
-        data.setPassword("cityslicka");
+        String data = "{ \"email\": \"eve.holt@reqres.in\", \"password\": \"cityslicka\" }";
 
-        step("Verify token is not empty and auth success", () -> {
-        given(baseRequestSpec)
+        given()
+                .log().uri()
+                .contentType(JSON)
                 .body(data)
                 .when()
-                .post(LOGIN)
+                .post("https://reqres.in/api/login")
                 .then()
-                .spec(baseResponseSpecCode200)
+                .log().status()
+                .log().body()
+                .statusCode(200)
                 .body("token", not(empty()));
-        });
     }
 
-    @Tag("api")
-    @DisplayName("Checking pagination per page")
+    @DisplayName("Checking paginagion per page")
     @Test
     void listTestPagination() {
-        step("Verify total users per page", () -> {
-            given(baseRequestSpec)
-                    .when()
-                    .get(LIST_USERS)
-                    .then()
-                    .spec(baseResponseSpecCode200)
-                    .body("total", is(12));
-        });
+        given()
+                .log().uri()
+                .contentType(JSON)
+                .when()
+                .get("https://reqres.in/api/users?page=2")
+                .then()
+                .log().status()
+                .log().body()
+                .body("total", is(12));
     }
 
-    @Tag("api")
     @DisplayName("Checking user in list")
     @Test
     void listTestCheckUserInList() {
-        step("Verify user in list", () -> {
-        given(baseRequestSpec)
+        given()
+                .log().uri()
+                .contentType(JSON)
                 .when()
-                .get(LIST_USERS)
+                .get("https://reqres.in/api/users?page=2")
                 .then()
-                .spec(baseResponseSpecCode200)
+                .log().status()
+                .log().body()
                 .body("data.id", hasItems(10, 12));
-        });
     }
 
-    @Tag("api")
     @DisplayName("Create new user and check name and job")
     @Test
     void createUser() {
-        UserBodyModel data = new UserBodyModel();
-        data.setName("morpheus");
-        data.setJob("leader");
-        CreateUserResponseModel response = step("Data entry", () ->
-                given(baseRequestSpec)
+        String data = "{ \"name\": \"morpheus\", \"job\": \"leader\" }";
+        given()
+                .log().uri()
+                .contentType(JSON)
+                .body(data)
                 .when()
-                .post(USERS)
+                .post("https://reqres.in/api/users")
                 .then()
-                .spec(baseResponseSpecCode200)
-                .extract().as(CreateUserResponseModel.class));
-
-        step("Checking the place of work and name", () -> {
-            assertThat(response.getName()).isEqualTo("morpheus");
-            assertThat(response.getJob()).isEqualTo("leader");
-    });
+                .log().status()
+                .log().body()
+                .body("name", is("morpheus"))
+                .body("job", is("leader"));
     }
 
-    @Tag("api")
     @DisplayName("Delete user ")
     @Test
     void deleteUser() {
-        step("Deleting a user", () -> {
-            given(baseRequestSpec)
+        given()
+                .log().uri()
                 .when()
-                .delete(SINGLE_USER)
+                .delete("https://reqres.in/api/users/2")
                 .then()
-                .spec(baseResponseSpecCode204);
-        });
+                .log().body()
+                .statusCode(204);
     }
 
-    @Tag("api")
     @DisplayName("Update userdata")
     @Test
     void updateUserdata() {
-        UserBodyModel data = new UserBodyModel();
-        data.setName("morpheus");
-        data.setJob("ext director");
-
-        UpdateUserResponseModel response = step("Data entry", () ->
-                given(baseRequestSpec)
+        String data = "{ \"name\": \"morpheus\", \"job\": \"zion resident\" }";
+        given()
+                .log().uri()
+                .contentType(JSON)
+                .body(data)
                 .when()
-                .put(SINGLE_USER)
+                .put("https://reqres.in/api/users/2")
                 .then()
-                .spec(baseResponseSpecCode200)
-                .extract().as(UpdateUserResponseModel.class));
-
-        step("Checking the name and job", () -> {
-            assertThat(response.getName()).isEqualTo("morpheus");
-            assertThat(response.getJob()).isEqualTo("ext director");
-        });
-
+                .log().body()
+                .body("name", is("morpheus"))
+                .body("job", is("zion resident"));
     }
 }
