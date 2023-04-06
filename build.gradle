@@ -44,9 +44,9 @@ test {
 
 }
 
-task lombok_tests(type: Test) {
+task api_tests(type: Test) {
     useJUnitPlatform {
-        includeTags("Lombok")
+        includeTags("api")
     }
     systemProperties(System.getProperties())
 }
