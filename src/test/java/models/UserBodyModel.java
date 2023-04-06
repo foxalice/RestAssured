@@ -9,3 +9,4 @@ public class UserBodyModel {
   private String name;
   private String job;
 }
+
