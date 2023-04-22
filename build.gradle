@@ -8,8 +8,8 @@ repositories {
     mavenCentral()
 }
 
-def allureVersion = "2.19.0"
-
+def allureVersion = "2.19.0",
+    selenideVersion = "5.20.4"
 
 allure {
     report {
@@ -29,6 +29,7 @@ dependencies {
     testImplementation(
             'org.junit.jupiter:junit-jupiter:5.8.1',
             'io.rest-assured:rest-assured:5.3.0',
+            "com.codeborne:selenide:$selenideVersion",
             "io.qameta.allure:allure-rest-assured:$allureVersion",
             "com.fasterxml.jackson.core:jackson-databind:2.14.2",
             "org.assertj:assertj-core:3.24.2",
